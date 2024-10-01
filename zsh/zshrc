@@ -1,0 +1,278 @@
+# ===================================================================
+# Enhanced ZSH Configuration for Development
+# ===================================================================
+
+# Path configuration
+export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+
+# Oh My Zsh configuration
+export ZSH=~/.oh-my-zsh
+ZSH_THEME="pixegami-agnoster"
+
+# Plugins
+plugins=(
+  git
+  zsh-syntax-highlighting
+  zsh-autosuggestions
+  docker
+  docker-compose
+  npm
+  node
+  python
+  golang
+  extract
+  colored-man-pages
+  command-not-found
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# ===================================================================
+# Editor Configuration (Vim Integration)
+# ===================================================================
+export EDITOR='vim'
+export VISUAL='vim'
+
+# Enable vi mode in shell
+set -o vi
+
+# Better vi mode indicators
+function zle-keymap-select {
+  if [[ ${KEYMAP} == vicmd ]] ||
+     [[ $1 = 'block' ]]; then
+    echo -ne '\e[1 q'
+  elif [[ ${KEYMAP} == main ]] ||
+       [[ ${KEYMAP} == viins ]] ||
+       [[ ${KEYMAP} = '' ]] ||
+       [[ $1 = 'beam' ]]; then
+    echo -ne '\e[5 q'
+  fi
+}
+zle -N zle-keymap-select
+
+# ===================================================================
+# Development Environment Setup
+# ===================================================================
+
+# Java version switcher functions
+export JAVA_HOME_17=/usr/lib/jvm/java-17-openjdk-amd64
+export JAVA_HOME_21=/usr/lib/jvm/java-21-openjdk-amd64
+export JAVA_HOME=$JAVA_HOME_21
+
+setJdk17() { 
+    export JAVA_HOME=$JAVA_HOME_17
+    export PATH=$JAVA_HOME/bin:$PATH
+    echo "Java 17 activated: $(java -version 2>&1 | head -n1)"
+}
+
+setJdk21() { 
+    export JAVA_HOME=$JAVA_HOME_21
+    export PATH=$JAVA_HOME/bin:$PATH
+    echo "Java 21 activated: $(java -version 2>&1 | head -n1)"
+}
+
+# Node.js (NVM integration)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Go configuration
+export GOPATH=$HOME/go
+export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+
+# Python configuration
+export PATH=$HOME/.local/bin:$PATH
+
+# ===================================================================
+# Aliases - Development Focused
+# ===================================================================
+
+# Vim aliases
+alias v='vim'
+alias vi='vim'
+alias vimrc='vim ~/.vimrc'
+alias zrc='vim ~/.zshrc'
+
+# Enhanced ls aliases
+alias ll='ls -la'
+alias la='ls -A'
+alias l='ls -CF'
+alias lt='ls -ltr'
+alias lh='ls -lah'
+
+# Git aliases
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git log --oneline -10'
+alias gd='git diff'
+alias gb='git branch'
+alias gco='git checkout'
+
+# Development aliases
+alias py='python3'
+alias pip='pip3'
+alias serve='python3 -m http.server'
+alias jsonpp='python3 -m json.tool'
+
+# Docker aliases
+alias d='docker'
+alias dc='docker-compose'
+alias dps='docker ps'
+alias di='docker images'
+
+# System aliases
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias h='history'
+alias c='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# File operations
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='rm -i'
+alias mkdir='mkdir -pv'
+
+# Network and system info
+alias myip='curl -s http://whatismyip.akamai.com/'
+alias ports='netstat -tulanp'
+alias meminfo='free -m -l -t'
+alias cpuinfo='lscpu'
+alias diskusage='df -h'
+
+# Quick directory navigation
+alias proj='cd ~/Projects'
+alias docs='cd ~/Documents'
+alias dwn='cd ~/Downloads'
+alias repos='cd ~/Projects/repos'
+
+# ===================================================================
+# Functions - Enhanced Productivity
+# ===================================================================
+
+# Quick project creation
+mkproject() {
+    if [ -z "$1" ]; then
+        echo "Usage: mkproject <project_name>"
+        return 1
+    fi
+    mkdir -p ~/Projects/$1
+    cd ~/Projects/$1
+    git init
+    echo "# $1" > README.md
+    echo "Created project: $1"
+}
+
+# Extract function
+extract() {
+    if [ -f $1 ] ; then
+        case $1 in
+            *.tar.bz2)   tar xjf $1     ;;
+            *.tar.gz)    tar xzf $1     ;;
+            *.bz2)       bunzip2 $1     ;;
+            *.rar)       unrar x $1     ;;
+            *.gz)        gunzip $1      ;;
+            *.tar)       tar xf $1      ;;
+            *.tbz2)      tar xjf $1     ;;
+            *.tgz)       tar xzf $1     ;;
+            *.zip)       unzip $1       ;;
+            *.Z)         uncompress $1  ;;
+            *.7z)        7z x $1        ;;
+            *)           echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+# Find and edit files quickly
+vf() {
+    local file
+    file=$(find . -type f -name "*$1*" | head -1)
+    if [ -n "$file" ]; then
+        vim "$file"
+    else
+        echo "File not found: *$1*"
+    fi
+}
+
+# Quick grep in files
+grepf() {
+    if [ -z "$1" ]; then
+        echo "Usage: grepf <pattern> [file_pattern]"
+        return 1
+    fi
+    local pattern=$1
+    local files=${2:-"*"}
+    grep -r --include="$files" "$pattern" .
+}
+
+# Process management
+psg() {
+    ps aux | grep -v grep | grep "$1"
+}
+
+# ===================================================================
+# History Configuration
+# ===================================================================
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY
+setopt APPEND_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
+
+# ===================================================================
+# Performance and Behavior
+# ===================================================================
+setopt AUTO_LIST
+setopt AUTO_MENU
+setopt ALWAYS_TO_END
+setopt AUTO_CD
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_SILENT
+setopt EXTENDED_GLOB
+setopt NO_CASE_GLOB
+
+# ===================================================================
+# Terminal and Display
+# ===================================================================
+export TERM=xterm-256color
+export LESS='-R'
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# ===================================================================
+# Completion Enhancements
+# ===================================================================
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w -w"
+
+# ===================================================================
+# Conditional Loading
+# ===================================================================
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+[ -f ~/.zshrc.work ] && source ~/.zshrc.work
+[ -f ~/.zshrc.paths ] && source ~/.zshrc.paths
+
+# ===================================================================
+# Welcome Message
+# ===================================================================
+echo "Welcome back! $(date '+%Y-%m-%d %H:%M')"
+echo "Current directory: $(pwd)"
+if command -v git &> /dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
+    echo "Git branch: $(git branch --show-current 2>/dev/null)"
+fi

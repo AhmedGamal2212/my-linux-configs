@@ -1,0 +1,83 @@
+" ===================================================================
+" Clean Vim Configuration - Development Focused
+" ===================================================================
+
+" Basic Settings
+set nocompatible              " Use Vim defaults, not vi compatibility
+set number                    " Show line numbers
+set relativenumber            " Show relative line numbers
+syntax on                     " Enable syntax highlighting
+set showmatch                 " Highlight matching parentheses
+set incsearch                 " Incremental search
+set ignorecase                " Case-insensitive search by default
+set smartcase                 " Case-sensitive when uppercase letters are used
+set hlsearch                  " Highlight search results
+set clipboard=unnamedplus     " Use system clipboard (requires +clipboard support)
+
+" Indentation
+set autoindent                " Auto-indent new lines
+set smartindent               " Smarter autoindent for code
+set expandtab                 " Use spaces instead of tabs
+set shiftwidth=4              " Indent by 4 spaces
+set softtabstop=4             " Tab feels like 4 spaces
+set tabstop=4                 " A tab is 4 spaces
+
+" Key mappings
+let mapleader = ","           " Set leader key to comma
+inoremap jj <Esc>             " 'jj' to escape insert mode
+nnoremap <silent> <Space> :nohlsearch<CR> " Clear search highlight with space
+
+" Basic navigation
+nnoremap H ^                  " H goes to beginning of line
+nnoremap L $                  " L goes to end of line
+
+" Window management
+nnoremap <C-h> <C-w>h         " Navigate between splits
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" Enhanced clipboard mappings
+vnoremap <leader>y "+y        " Copy selection to system clipboard
+nnoremap <leader>y "+y        " Copy to system clipboard
+nnoremap <leader>p "+p        " Paste from system clipboard
+
+" Visual settings
+set cursorline                " Highlight current line
+set scrolloff=5               " Keep 5 lines of context when scrolling
+set wrap                      " Wrap long lines
+set ruler                     " Show cursor position
+set laststatus=2              " Always show status line
+set showcmd                   " Show partial commands in status line
+
+" Performance
+set lazyredraw                " Don't redraw while executing macros
+set ttyfast                   " Faster scrolling
+
+" File handling
+set noswapfile                " Don't use swap files
+set nobackup                  " Don't keep backup files
+set undofile                  " Persistent undo
+set autoread                  " Auto-reload files changed outside vim
+set hidden                    " Allow switching buffers without saving
+
+" Create undo directory if it doesn't exist
+if !isdirectory($HOME."/.vim/undo")
+    call mkdir($HOME."/.vim/undo", "p", 0700)
+endif
+set undodir=~/.vim/undo
+
+" Search improvements
+set gdefault                  " Global search/replace by default
+
+" Development helpers
+set backspace=indent,eol,start " Allow backspace over everything
+set wildmenu                  " Enhanced command completion
+set wildmode=list:longest,full " Complete longest common string, then full
+
+" Auto-commands
+augroup BasicSettings
+    autocmd!
+    " Return to last edit position when opening files
+    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+augroup END
