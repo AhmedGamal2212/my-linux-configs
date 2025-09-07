@@ -23,6 +23,11 @@ plugins=(
   extract
   colored-man-pages
   command-not-found
+  # Enhanced productivity plugins
+  jsontools          # JSON utilities: pp_json, is_json, urlencode_json, urldecode_json
+  web-search         # Search from terminal: google "query", stackoverflow "query"
+  copyfile           # Copy file content to clipboard: copyfile ~/.zshrc
+  sudo               # Press ESC twice to add sudo to current/previous command
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -71,10 +76,21 @@ setJdk21() {
     echo "Java 21 activated: $(java -version 2>&1 | head -n1)"
 }
 
-# Node.js (NVM integration)
+# Node.js (NVM integration with lazy loading for faster shell startup)
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Lazy load NVM - only load when needed
+lazy_load_nvm() {
+    unset -f nvm node npm npx
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+}
+
+# Create wrapper functions that trigger lazy loading
+nvm() { lazy_load_nvm; nvm "$@"; }
+node() { lazy_load_nvm; node "$@"; }
+npm() { lazy_load_nvm; npm "$@"; }
+npx() { lazy_load_nvm; npx "$@"; }
 
 # Go configuration
 export GOPATH=$HOME/go
@@ -100,7 +116,7 @@ alias l='ls -CF'
 alias lt='ls -ltr'
 alias lh='ls -lah'
 
-# Git aliases
+# Enhanced git aliases
 alias gs='git status'
 alias ga='git add'
 alias gc='git commit'
@@ -109,6 +125,14 @@ alias gl='git log --oneline -10'
 alias gd='git diff'
 alias gb='git branch'
 alias gco='git checkout'
+
+# Enhanced Git Commands
+alias gst='git status -sb'           # Short format with branch info
+alias glog='git log --oneline --graph --decorate --all -20'
+alias gdiff='git diff --word-diff'   # Word-level diff
+alias gundo='git reset --soft HEAD~1'
+alias gclean='git clean -fd && git reset --hard'
+alias gpull='git pull --rebase --autostash'
 
 # Development aliases
 alias py='python3'
@@ -150,6 +174,39 @@ alias proj='cd ~/Projects'
 alias docs='cd ~/Documents'
 alias dwn='cd ~/Downloads'
 alias repos='cd ~/Projects/repos'
+
+# Coffee Aliases
+alias coffee="echo ☕ Brewing inspiration..."
+
+# Modern CLI Tools (install with: cargo install eza bat fd-find ripgrep)
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --icons'
+    alias ll='eza -l --icons --git'
+    alias la='eza -la --icons --git'
+    alias lt='eza -l --sort=modified --icons'
+    alias tree='eza --tree --icons'
+fi
+
+if command -v bat >/dev/null 2>&1; then
+    alias cat='bat --paging=never'
+    alias less='bat'
+    export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+fi
+
+if command -v fd >/dev/null 2>&1; then
+    alias find='fd'
+fi
+
+if command -v rg >/dev/null 2>&1; then
+    alias grep='rg'
+fi
+
+# Git Enhanced with tig
+if command -v tig >/dev/null 2>&1; then
+    alias tigs='tig status'     # Interactive git status
+    alias tigl='tig'            # Interactive git log
+    alias tigb='tig --branches' # All branches view
+fi
 
 # ===================================================================
 # Functions - Enhanced Productivity
@@ -217,6 +274,202 @@ psg() {
     ps aux | grep -v grep | grep "$1"
 }
 
+# Smart cd with fuzzy finding (requires fzf)
+if command -v fzf >/dev/null 2>&1; then
+    fcd() {
+        local dir
+        dir=$(find ${1:-.} -type d 2>/dev/null | fzf --height 40% --border) && cd "$dir"
+    }
+    
+    # Quick file editing with fuzzy search and preview
+    vff() {
+        local file
+        file=$(find . -type f 2>/dev/null | fzf --height 40% --border --preview 'bat --color=always {}') && vim "$file"
+    }
+fi
+
+# Better project creation with templates
+mkproject() {
+    local name="$1"
+    local template="${2:-basic}"
+    
+    [[ -z "$name" ]] && { echo "Usage: mkproject <name> [template]"; return 1; }
+    
+    mkdir -p ~/Projects/"$name" && cd ~/Projects/"$name"
+    git init
+    
+    case "$template" in
+        "node") 
+            echo '{"name":"'$name'","version":"1.0.0","main":"index.js"}' > package.json 
+            echo "console.log('Hello from $name');" > index.js
+            ;;
+        "python") 
+            touch requirements.txt 
+            echo "# $name" > README.md
+            echo "#!/usr/bin/env python3" > main.py
+            ;;
+        "go") 
+            go mod init "$name" 
+            echo "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello from $name\")\n}" > main.go
+            ;;
+        *) 
+            echo "# $name\n\nA new project." > README.md 
+            ;;
+    esac
+    
+    echo "Created $template project: $name"
+}
+
+# Git utility functions (gwip is provided by Oh My Zsh git plugin)
+gsync() { 
+    echo "Syncing with remote..."
+    git pull --rebase --autostash && git push 
+}
+
+# Git branch management
+gnew() {
+    [[ -z "$1" ]] && { echo "Usage: gnew <branch-name>"; return 1; }
+    git checkout -b "$1"
+}
+
+gswitch() {
+    local branch
+    branch=$(git branch | fzf --height 20% | sed 's/^[ *]*//')
+    [[ -n "$branch" ]] && git checkout "$branch"
+}
+
+# Custom clipboard functions (replacing copydir plugin)
+copydir() {
+    [[ -z "$1" ]] && local dir="$(pwd)" || local dir="$1"
+    [[ -d "$dir" ]] || { echo "Directory not found: $dir"; return 1; }
+    realpath "$dir" | tr -d '\n' | xclip -selection clipboard 2>/dev/null || echo "$(realpath "$dir")"
+    echo "Directory path copied: $(realpath "$dir")"
+}
+
+# ===================================================================
+# Development Environment Utilities
+# ===================================================================
+
+# PostgreSQL Database Management
+if command -v psql >/dev/null 2>&1; then
+    # List all databases
+    psql-list() {
+        psql -U postgres -c "\l"
+    }
+    
+    # Create database
+    psql-create() {
+        [[ -z "$1" ]] && { echo "Usage: psql-create <dbname>"; return 1; }
+        createdb -U postgres "$1"
+        echo "Database '$1' created"
+    }
+    
+    # Drop database  
+    psql-drop() {
+        [[ -z "$1" ]] && { echo "Usage: psql-drop <dbname>"; return 1; }
+        read "response?Are you sure you want to drop database '$1'? (y/N): "
+        [[ "$response" =~ ^[Yy]$ ]] && dropdb -U postgres "$1" && echo "Database '$1' dropped"
+    }
+    
+    # Connect to database
+    psql-connect() {
+        local db="${1:-postgres}"
+        psql -U postgres -d "$db"
+    }
+fi
+
+# Docker Management Utilities  
+if command -v docker >/dev/null 2>&1; then
+    # Execute shell in running container
+    dexec() {
+        [[ -z "$1" ]] && { echo "Usage: dexec <container-name-or-id>"; return 1; }
+        docker exec -it "$1" /bin/bash 2>/dev/null || docker exec -it "$1" /bin/sh
+    }
+    
+    # Follow container logs
+    dlogs() {
+        [[ -z "$1" ]] && { echo "Usage: dlogs <container-name-or-id>"; return 1; }
+        docker logs -f "$1"
+    }
+    
+    # Clean up Docker system
+    dclean() {
+        echo "Cleaning up Docker system..."
+        docker system prune -f
+        docker image prune -f
+        echo "Docker cleanup complete"
+    }
+    
+    # Show container resource usage
+    dstats() {
+        docker stats --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}"
+    }
+    
+    # Quick container management
+    dstop() { docker stop "$1"; }
+    dstart() { docker start "$1"; }
+    drmi() { docker rmi "$1"; }
+fi
+
+# Development Server Management
+serve-py() {
+    local port="${1:-8000}"
+    echo "Starting Python server on port $port"
+    python3 -m http.server "$port"
+}
+
+serve-node() {
+    local port="${1:-3000}"
+    [[ ! -f "package.json" ]] && { echo "No package.json found"; return 1; }
+    echo "Starting Node.js server on port $port"
+    npm start
+}
+
+# Environment Information Display
+devinfo() {
+    echo "=== Development Environment Info ==="
+    echo "OS: $(uname -s) $(uname -r)"
+    echo "Shell: $SHELL"
+    echo "Java: $(java -version 2>&1 | head -1 | cut -d'"' -f2 2>/dev/null || echo 'Not installed')"
+    echo "Python: $(python3 --version 2>/dev/null | cut -d' ' -f2 || echo 'Not installed')"
+    echo "Node.js: $(node --version 2>/dev/null || echo 'Not installed')"
+    echo "Go: $(go version 2>/dev/null | cut -d' ' -f3 || echo 'Not installed')"
+    echo "Docker: $(docker --version 2>/dev/null | cut -d' ' -f3 | tr -d ',' || echo 'Not installed')"
+    echo "Git: $(git --version | cut -d' ' -f3)"
+    echo "Current Directory: $(pwd)"
+    [[ -d .git ]] && echo "Git Branch: $(git branch --show-current 2>/dev/null)"
+}
+
+# Project Environment Setup
+setup-env() {
+    local project_type="$1"
+    
+    case "$project_type" in
+        "node"|"js"|"javascript")
+            echo "Setting up Node.js environment..."
+            [[ ! -f package.json ]] && npm init -y
+            npm install --save-dev eslint prettier
+            echo "Node.js environment setup complete"
+            ;;
+        "python"|"py")
+            echo "Setting up Python environment..."
+            python3 -m venv venv
+            echo "Virtual environment created. Activate with: source venv/bin/activate"
+            ;;
+        "go")
+            echo "Setting up Go environment..."
+            [[ ! -f go.mod ]] && go mod init "$(basename $(pwd))"
+            echo "Go module initialized"
+            ;;
+        *)
+            echo "Usage: setup-env <node|python|go>"
+            echo "  node    - Initialize package.json, install eslint & prettier"
+            echo "  python  - Create virtual environment"  
+            echo "  go      - Initialize go module"
+            ;;
+    esac
+}
+
 # ===================================================================
 # History Configuration
 # ===================================================================
@@ -268,11 +521,89 @@ zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w 
 [ -f ~/.zshrc.work ] && source ~/.zshrc.work
 [ -f ~/.zshrc.paths ] && source ~/.zshrc.paths
 
-# ===================================================================
-# Welcome Message
-# ===================================================================
-echo "Welcome back! $(date '+%Y-%m-%d %H:%M')"
-echo "Current directory: $(pwd)"
-if command -v git &> /dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
-    echo "Git branch: $(git branch --show-current 2>/dev/null)"
+# ================================
+# Minimal Portable Welcome Message
+# ================================
+[[ $- != *i* ]] && return
+
+# --- Color setup using ANSI codes (works almost everywhere) ---
+if [[ -t 1 ]]; then
+    BOLD="\033[1m"; RESET="\033[0m"
+    WHITE="\033[37m"; CYAN="\033[36m"; MAGENTA="\033[35m"; GREEN="\033[32m"; YELLOW="\033[33m"
+else
+    BOLD=""; RESET=""; WHITE=""; CYAN=""; MAGENTA=""; GREEN=""; YELLOW=""
 fi
+
+# --- Simple white separator ---
+hr() {
+  printf "${WHITE}%s${RESET}\n" "----------------------------------------"
+}
+
+# --- Welcome Info ---
+hr
+echo -e "${MAGENTA}${BOLD}Welcome, $(whoami)!${RESET}"
+echo -e "${BOLD}Date:${RESET} $(date '+%Y-%m-%d %H:%M')"
+echo -e "${BOLD}Dir:${RESET} $(pwd)"
+if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  printf "${BOLD}Branch:${RESET} %s\n" "$(git branch --show-current 2>/dev/null)"
+fi
+hr
+
+# --- Coffee Quote (wrapped to ~40 characters for readability) ---
+_generate_coffee_quote() {
+  local quotes=(
+    "Coffee first, problems later."
+    "Espresso yourself before you depresso."
+    "Life happens, coffee helps."
+    "Behind every successful developer is a strong cup of coffee."
+    "Procaffeinating: not starting anything until coffee is brewed."
+    "Java keeps my code compiling and my brain awake."
+    "Beans to bytes: compile, sip, repeat."
+  )
+  local q="${quotes[$(($RANDOM % ${#quotes[@]} + 1))]}"
+  [[ "$LANG" == *"UTF-8"* ]] && q="☕ $q"
+  echo "$q" | while read -r l; do
+    printf "${CYAN}%s${RESET}\n" "$l"
+  done
+}
+_generate_coffee_quote
+hr
+
+# ============================
+# Random "caf" Command
+# ============================
+caf() {
+  # Colors (safe fallback)
+  local RESET="\033[0m" CYAN="\033[36m" MAGENTA="\033[35m" YELLOW="\033[33m"
+
+  # --- Coffee Fortunes ---
+  local fortunes=(
+    "Today's brew: Courage, with a shot of chaos."
+    "Coffee is temporary, code reviews are forever."
+    "The mug chooses the programmer."
+    "Your caffeine intake today will make you write elegant regex."
+    "Beans whisper: Ship it to prod. Ignore QA."
+  )
+
+  local mode=$((RANDOM % 2))
+  local fortune_index=$(((RANDOM % ${#fortunes[@]}) + 1))
+
+  case $mode in
+    0) # Coffee fortune
+      printf '%b%s%b\n' "$MAGENTA" "${fortunes[$fortune_index]}" "$RESET"
+      ;;
+    1) # Coffee brewing animation
+      printf '%b%s%b' "$YELLOW" "Brewing coffee" "$RESET"
+      for i in {1..5}; do
+        printf "."
+        sleep 0.2
+      done
+      printf ' Ready!\n'
+      ;;
+  esac
+}
+
+# ===================================================================
+# Starship Prompt (must be at the end)
+# ===================================================================
+eval "$(starship init zsh)"

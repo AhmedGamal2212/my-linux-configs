@@ -44,15 +44,9 @@ elif [ "$PKG_MANAGER" = "dnf" ]; then
     $INSTALL_CMD python3 python3-pip python3-devel
 fi
 
-# Install Go (via package manager - simpler but may not be latest)
-echo "🐹 Installing Go programming language..."
-if [ "$PKG_MANAGER" = "apt" ]; then
-    $INSTALL_CMD golang-go
-elif [ "$PKG_MANAGER" = "dnf" ]; then
-    $INSTALL_CMD golang
-fi
-
-echo "📝 Note: For latest Go version (1.24.x), use manual installation from https://go.dev/dl/"
+# Install Go (latest version via go-installer)
+echo "🐹 Installing Go programming language (latest version)..."
+bash <(curl -sL https://git.io/go-installer)
 
 # Install Node.js via NVM (more flexible than package manager)
 echo "🟢 Installing Node.js via NVM..."

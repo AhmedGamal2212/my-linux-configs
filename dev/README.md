@@ -44,14 +44,7 @@ pip3 --version     # Should be 25.x for latest features
 
 ### Go Development
 ```bash
-# Method 1: Package manager (may not be latest)
-# Ubuntu/Debian
-sudo apt install -y golang-go
-
-# Fedora  
-sudo dnf install -y golang
-
-# Method 2: go-installer (latest version - recommended)
+# Install Go (latest version - recommended)
 # Easy Go installer from https://github.com/kerolloz/go-installer
 # Doesn't download the script ~ runs the script directly
 bash <(curl -sL https://git.io/go-installer)
