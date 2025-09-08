@@ -36,69 +36,6 @@ my-linux-config/
     └── fix-permissions.sh
 ```
 
-## Complete Setup Guide
-
-### 1. System Preparation
-```bash
-# Fix any permission issues first (if needed)
-./troubleshooting/fix-permissions.sh
-
-# Make scripts executable
-chmod +x */install.sh
-```
-
-### 2. Core Development Environment
-```bash
-# Install essential development tools first
-# See dev/README.md for complete setup guide
-
-# Ubuntu/Debian (Zorin OS)
-sudo apt update && sudo apt install -y build-essential curl git wget
-
-# Fedora
-sudo dnf install -y @development-tools curl git wget
-```
-
-### 3. Terminal Profile Theme (Ubuntu/Debian only)
-```bash
-# Install enhanced terminal theme with custom fonts, icons, git support, autocomplete
-# From https://github.com/pixegami/terminal-profile
-curl -sL https://raw.githubusercontent.com/pixegami/terminal-profile/main/install_profile.sh | bash
-```
-
-### 4. Fonts and Terminal Setup
-```bash
-# Install fonts first (needed for terminal)
-cd fonts && ./install.sh
-
-# Install and configure terminal
-cd kitty && ./install.sh
-```
-
-### 5. Shell and Editor
-```bash
-# Install shell (includes development aliases and Java switcher)
-cd zsh && ./install.sh
-
-# Install editor
-cd vim && ./install.sh
-```
-
-### 6. Programming Languages and Tools
-```bash
-# See dev/README.md for detailed language setup:
-# - Java (OpenJDK 17 & 21)
-# - Python 3 + pip + venv
-# - Node.js via NVM
-# - Golang
-# - Additional development tools
-```
-
-### 7. Optional Components
-```bash
-# Docker, databases, etc. (see dev/README.md)
-```
-
 ## Quick Setup
 
 ### 🚀 Interactive Installation (Recommended)
@@ -134,44 +71,58 @@ cd my-linux-configs
 ./install.sh
 ```
 
-## Modular Installation
+## Manual Installation
 
-### Individual Component Installation
-If you prefer manual control over the installation process:
-
+### System Preparation
 ```bash
-# Install fonts first (recommended)
-cd fonts && ./install.sh
+# Fix any permission issues first (if needed)
+./troubleshooting/fix-permissions.sh
 
-# Install development tools (essential)
-cd dev && ./install-essentials.sh
+# Make scripts executable
+chmod +x */install.sh
 
-# Install java configuration
-cd java && ./install.sh
-
-# Install kitty terminal
-cd kitty && ./install.sh
-
-# Install vim configuration  
-cd vim && ./install.sh
-
-# Install zsh configuration
-cd zsh && ./install.sh
+# Install system build tools (required for development)
+# Ubuntu/Debian: sudo apt update && sudo apt install -y build-essential curl git wget
+# Fedora: sudo dnf install -y @development-tools curl git wget
 ```
 
-### Manual Configuration (if scripts fail)
-Each component directory contains clean config files that can be copied manually:
+### Component Installation Order
+Install components in the recommended order for best results:
 
 ```bash
-# Manual vim setup
+# 1. Fonts (needed for terminal display)
+cd fonts && ./install.sh
+
+# 2. Development environment (see dev/README.md for details)
+cd dev && ./install-essentials.sh
+cd dev && ./install-optional.sh  # optional tools
+
+# 3. Java development (see java/README.md for details)
+cd java && ./install.sh
+
+# 4. Terminal & shell
+cd zsh && ./install.sh    # ZSH + modern CLI tools
+cd kitty && ./install.sh  # terminal emulator (optional)
+
+# 5. Editor
+cd vim && ./install.sh    # vim configuration (optional)
+```
+
+### Manual Configuration Fallback
+If installation scripts fail, manually copy configuration files:
+
+```bash
+# System preparation
 cp vim/vimrc ~/.vimrc
-
-# Manual kitty setup
-mkdir -p ~/.config/kitty
-cp kitty/kitty.conf ~/.config/kitty/kitty.conf
-
-# Manual zsh setup
+mkdir -p ~/.config/kitty && cp kitty/kitty.conf ~/.config/kitty/
 cp zsh/zshrc ~/.zshrc
+```
+
+### Ubuntu/Debian Terminal Theme (Optional)
+Enhanced terminal theme with additional visual improvements:
+```bash
+# From https://github.com/pixegami/terminal-profile
+curl -sL https://raw.githubusercontent.com/pixegami/terminal-profile/main/install_profile.sh | bash
 ```
 
 ## Features
