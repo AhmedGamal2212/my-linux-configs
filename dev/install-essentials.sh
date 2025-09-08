@@ -85,21 +85,46 @@ if [[ $REPLY =~ ^[Nn]$ ]]; then
 else
     echo -e "${YELLOW}Installing Node.js via NVM...${NC}"
     if [ ! -d "$HOME/.nvm" ]; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+        echo -e "${BLUE}📥 Fetching latest NVM version...${NC}"
+        # Get the latest NVM version dynamically from GitHub API
+        NVM_VERSION=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+        
+        if [ -z "$NVM_VERSION" ]; then
+            echo -e "${YELLOW}⚠️  Could not fetch latest NVM version, using fallback v0.40.3${NC}"
+            NVM_VERSION="v0.40.3"
+        else
+            echo -e "${GREEN}✅ Latest NVM version: $NVM_VERSION${NC}"
+        fi
+        
+        # Install NVM with the latest version
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh | bash
         
         # Source NVM for this script
         export NVM_DIR="$HOME/.nvm"
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
         
-        # Install latest LTS Node.js (v22)
-        nvm install 22
-        nvm use 22
-        nvm alias default 22
+        # Install latest LTS Node.js (dynamically determined)
+        echo -e "${BLUE}📥 Installing latest LTS Node.js...${NC}"
+        nvm install --lts
+        nvm use --lts
+        nvm alias default lts/*
         
-        echo -e "${GREEN}✅ Node.js v22 LTS installed via NVM${NC}"
+        # Get installed Node.js version for display
+        NODE_VERSION=$(node --version 2>/dev/null || echo "unknown")
+        echo -e "${GREEN}✅ Node.js $NODE_VERSION LTS installed via NVM${NC}"
         NODEJS_INSTALLED=true
     else
         echo -e "${GREEN}✅ NVM already installed${NC}"
+        # Still ensure we're using the latest LTS if NVM exists
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        
+        echo -e "${BLUE}🔄 Ensuring latest LTS Node.js is installed...${NC}"
+        nvm install --lts --reinstall-packages-from=current 2>/dev/null || nvm install --lts
+        nvm alias default lts/*
+        
+        NODE_VERSION=$(node --version 2>/dev/null || echo "unknown")
+        echo -e "${GREEN}✅ Using Node.js $NODE_VERSION LTS${NC}"
         NODEJS_INSTALLED=true
     fi
 fi
