@@ -7,9 +7,11 @@ echo "=== ZSH Shell Setup ==="
 
 # Detect package manager and install zsh
 if command -v apt &> /dev/null; then
+    PKG_MANAGER="apt"
     echo "Installing ZSH (Ubuntu/Debian)..."
     sudo apt update && sudo apt install -y zsh curl git
 elif command -v dnf &> /dev/null; then
+    PKG_MANAGER="dnf"
     echo "Installing ZSH (Fedora)..."
     sudo dnf install -y zsh curl git
 else
@@ -47,12 +49,16 @@ elif [ "$PKG_MANAGER" = "dnf" ]; then
     sudo dnf install -y tig fzf
 fi
 
-# Install Rust (for modern CLI tools)
+# Check for Rust installation (should be installed via dev/install-essentials.sh)
 if ! command -v cargo &> /dev/null; then
-    echo "Installing Rust (required for modern CLI tools)..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    source ~/.cargo/env
-    echo "✓ Rust installed successfully"
+    echo "⚠️  Rust not found. Please install development essentials first:"
+    echo "     cd dev && ./install-essentials.sh"
+    echo "   Or install Rust manually:"
+    echo "     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
+    echo "   Then re-run this script."
+    exit 1
+else
+    echo "✓ Rust found, proceeding with modern CLI tools installation"
 fi
 
 # Install Rust-based modern CLI tools

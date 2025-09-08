@@ -67,6 +67,17 @@ else
     echo "✅ NVM already installed"
 fi
 
+# Install Rust (required for modern CLI tools)
+echo "🦀 Installing Rust programming language..."
+if ! command -v cargo &> /dev/null; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    # Source Rust environment for current session
+    source ~/.cargo/env
+    echo "✅ Rust installed successfully"
+else
+    echo "✅ Rust already installed"
+fi
+
 # Essential Python tools (user-level)
 echo "🔧 Installing essential Python tools..."
 pip3 install --user --upgrade pip setuptools wheel
@@ -85,6 +96,7 @@ echo "  • Git version control"
 echo "  • Python 3 + pip + venv"
 echo "  • Go programming language"
 echo "  • Node.js (latest LTS via NVM)"
+echo "  • Rust programming language"
 echo "  • Essential Python packages"
 echo "  • Development project directories"
 echo
