@@ -101,7 +101,44 @@ cd vim && ./install.sh
 
 ## Quick Setup
 
+### 🚀 Interactive Installation (Recommended)
+The easiest way to set up your development environment:
+
+```bash
+./install.sh
+```
+
+**Features:**
+- **Interactive guidance** - Clear descriptions for each module
+- **Selective installation** - Choose only what you need
+- **Proper dependency order** - Automatically handles prerequisites
+- **Colorful progress** - Visual feedback throughout the process
+- **Safety checks** - Backs up existing configurations
+
+**What you'll choose:**
+1. **System preparation** (permissions, script setup)
+2. **Fonts** (Fira Code, JetBrains Mono) 
+3. **Development environment** (languages: Python, Node.js, Go - your choice)
+4. **Terminal & shell** (ZSH + modern CLI tools)
+5. **Terminal emulator** (Kitty - optional)
+6. **Editor** (Vim configuration - optional)
+7. **Java development** (OpenJDK 17 & 21 - optional)
+8. **Additional tools** (databases, Docker, etc. - selective)
+
+### ⚡ One-Command Setup
+For a complete development environment with sensible defaults:
+```bash
+# Clone and run (press 'Y' for recommended modules)
+git clone <repository-url>
+cd my-linux-configs
+./install.sh
+```
+
+## Modular Installation
+
 ### Individual Component Installation
+If you prefer manual control over the installation process:
+
 ```bash
 # Install fonts first (recommended)
 cd fonts && ./install.sh

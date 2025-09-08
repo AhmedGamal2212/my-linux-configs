@@ -3,8 +3,15 @@
 
 set -e
 
-echo "=== Essential Development Environment Setup ==="
-echo "Installing core development tools and programming languages..."
+# Color codes for better output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}=== Essential Development Environment Setup ===${NC}"
+echo -e "${BLUE}Installing core development tools and programming languages...${NC}"
 echo
 
 # Detect package manager
@@ -21,15 +28,15 @@ else
     exit 1
 fi
 
-echo "📦 Detected package manager: $PKG_MANAGER"
+echo -e "${BLUE}📦 Detected package manager: $PKG_MANAGER${NC}"
 echo
 
 # Update package lists
-echo "🔄 Updating package lists..."
+echo -e "${YELLOW}🔄 Updating package lists...${NC}"
 $UPDATE_CMD
 
 # Install essential build tools
-echo "🔨 Installing build tools and essentials..."
+echo -e "\n${YELLOW}🔨 Installing build tools and essentials...${NC}"
 if [ "$PKG_MANAGER" = "apt" ]; then
     $INSTALL_CMD build-essential curl git wget
 elif [ "$PKG_MANAGER" = "dnf" ]; then
@@ -37,44 +44,46 @@ elif [ "$PKG_MANAGER" = "dnf" ]; then
 fi
 
 # Install Python development (interactive)
-echo "🐍 Python Development Environment"
+echo -e "\n${BLUE}🐍 Python Development Environment${NC}"
 read -p "Install Python 3 + pip + venv? (Y/n): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
-    echo "⏭️  Skipping Python installation"
+    echo -e "${YELLOW}⏭️  Skipping Python installation${NC}"
     PYTHON_INSTALLED=false
 else
-    echo "Installing Python development environment..."
+    echo -e "${YELLOW}Installing Python development environment...${NC}"
     if [ "$PKG_MANAGER" = "apt" ]; then
         $INSTALL_CMD python3 python3-pip python3-venv python3-dev
     elif [ "$PKG_MANAGER" = "dnf" ]; then
         $INSTALL_CMD python3 python3-pip python3-devel
     fi
     PYTHON_INSTALLED=true
+    echo -e "${GREEN}✅ Python installation completed${NC}"
 fi
 
 # Install Go (interactive)
-echo "🐹 Go Programming Language"
+echo -e "\n${BLUE}🐹 Go Programming Language${NC}"
 read -p "Install Go (latest version)? (Y/n): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
-    echo "⏭️  Skipping Go installation"
+    echo -e "${YELLOW}⏭️  Skipping Go installation${NC}"
     GO_INSTALLED=false
 else
-    echo "Installing Go programming language (latest version)..."
+    echo -e "${YELLOW}Installing Go programming language (latest version)...${NC}"
     bash <(curl -sL https://git.io/go-installer)
     GO_INSTALLED=true
+    echo -e "${GREEN}✅ Go installation completed${NC}"
 fi
 
 # Install Node.js via NVM (interactive)
-echo "🟢 Node.js Development Environment"
+echo -e "\n${BLUE}🟢 Node.js Development Environment${NC}"
 read -p "Install Node.js via NVM (latest LTS)? (Y/n): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
-    echo "⏭️  Skipping Node.js installation"
+    echo -e "${YELLOW}⏭️  Skipping Node.js installation${NC}"
     NODEJS_INSTALLED=false
 else
-    echo "Installing Node.js via NVM..."
+    echo -e "${YELLOW}Installing Node.js via NVM...${NC}"
     if [ ! -d "$HOME/.nvm" ]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
         
@@ -87,38 +96,41 @@ else
         nvm use 22
         nvm alias default 22
         
-        echo "✅ Node.js v22 LTS installed via NVM"
+        echo -e "${GREEN}✅ Node.js v22 LTS installed via NVM${NC}"
         NODEJS_INSTALLED=true
     else
-        echo "✅ NVM already installed"
+        echo -e "${GREEN}✅ NVM already installed${NC}"
         NODEJS_INSTALLED=true
     fi
 fi
 
 # Install Rust (required for modern CLI tools)
-echo "🦀 Installing Rust programming language..."
+echo -e "\n${BLUE}🦀 Rust Programming Language${NC}"
+echo -e "${YELLOW}Installing Rust (required for modern CLI tools)...${NC}"
 if ! command -v cargo &> /dev/null; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     # Source Rust environment for current session
     source ~/.cargo/env
-    echo "✅ Rust installed successfully"
+    echo -e "${GREEN}✅ Rust installed successfully${NC}"
 else
-    echo "✅ Rust already installed"
+    echo -e "${GREEN}✅ Rust already installed${NC}"
 fi
 
 # Essential Python tools (conditional)
 if [ "$PYTHON_INSTALLED" = true ]; then
-    echo "🔧 Installing essential Python tools..."
+    echo -e "\n${YELLOW}🔧 Installing essential Python tools...${NC}"
     pip3 install --user --upgrade pip setuptools wheel
+    echo -e "${GREEN}✅ Python tools installation completed${NC}"
 fi
 
 # Create development directories
-echo "📁 Creating development directories..."
+echo -e "\n${YELLOW}📁 Creating development directories...${NC}"
 mkdir -p ~/Projects/{python,nodejs,go}
 mkdir -p ~/go/{bin,src,pkg}
+echo -e "${GREEN}✅ Development directories created${NC}"
 
 echo
-echo "✅ Essential development environment installation completed!"
+echo -e "${GREEN}✅ Essential development environment installation completed!${NC}"
 echo
 echo "📋 What was installed:"
 echo "  • Build tools (gcc, make, etc.)"

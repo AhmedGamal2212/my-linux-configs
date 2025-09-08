@@ -539,15 +539,21 @@ hr() {
   printf "${WHITE}%s${RESET}\n" "----------------------------------------"
 }
 
-# --- Welcome Info ---
-hr
-echo -e "${MAGENTA}${BOLD}Welcome, $(whoami)!${RESET}"
-echo -e "${BOLD}Date:${RESET} $(date '+%Y-%m-%d %H:%M')"
-echo -e "${BOLD}Dir:${RESET} $(pwd)"
-if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-  printf "${BOLD}Branch:${RESET} %s\n" "$(git branch --show-current 2>/dev/null)"
-fi
-hr
+# --- Welcome Message Function ---
+print_welcome_msg() {
+  hr
+  echo -e "${MAGENTA}${BOLD}Welcome, $(whoami)!${RESET}"
+  echo -e "${BOLD}Date:${RESET} $(date '+%Y-%m-%d %H:%M')"
+  echo -e "${BOLD}Dir:${RESET} $(pwd)"
+  if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+    printf "${BOLD}Branch:${RESET} %s\n" "$(git branch --show-current 2>/dev/null)"
+  fi
+  hr
+  
+  # Coffee Quote
+  _generate_coffee_quote
+  hr
+}
 
 # --- Coffee Quote (wrapped to ~40 characters for readability) ---
 _generate_coffee_quote() {
@@ -566,8 +572,12 @@ _generate_coffee_quote() {
     printf "${CYAN}%s${RESET}\n" "$l"
   done
 }
-_generate_coffee_quote
-hr
+
+# Display welcome message on shell startup
+print_welcome_msg
+
+# Alias clear to redisplay welcome message for better UX
+alias clear='command clear && print_welcome_msg'
 
 # ============================
 # Random "caf" Command
