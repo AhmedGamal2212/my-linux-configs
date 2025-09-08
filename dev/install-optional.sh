@@ -64,8 +64,17 @@ fi
 # System monitoring and utilities
 echo "🖥️  Installing system utilities..."
 install_package "htop" "Interactive process viewer"
-install_package "neofetch" "System information tool"
 install_package "tree" "Directory tree viewer"
+
+# Optional eye candy
+echo "🎨 Optional system information display"
+read -p "Install neofetch (system info display)? (y/N): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    install_package "neofetch" "System information tool"
+else
+    echo "⏭️  Skipping neofetch installation"
+fi
 
 # Archive tools
 echo "📦 Installing archive utilities..."
