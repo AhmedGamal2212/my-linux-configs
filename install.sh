@@ -60,7 +60,27 @@ echo "  • Installation follows proper dependency order"
 echo "  • Existing configurations will be backed up"
 echo
 
-read -p "$(echo -e ${GREEN}Ready to begin? [Y/n]:${NC} )" -n 1 -r
+echo -e "${CYAN}🔄 Backup Recommendation:${NC}"
+echo -e "  • For comprehensive backup/restore: run ${BLUE}./testing/backup-current-config.sh${NC} first"
+echo "  • Individual scripts create simple .backup files"
+echo "  • Comprehensive backup allows full system restore if needed"
+echo
+
+read -p "$(echo -e ${YELLOW}Create comprehensive backup first? [Y/n]:${NC} )" -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+    if [ -f testing/backup-current-config.sh ]; then
+        echo -e "${BLUE}🔄 Creating comprehensive backup...${NC}"
+        cd testing && ./backup-current-config.sh && cd ..
+        echo -e "${GREEN}✅ Backup completed - you can restore later if needed${NC}"
+        echo
+    else
+        echo -e "${YELLOW}⚠️  Backup script not found, continuing with installation${NC}"
+        echo
+    fi
+fi
+
+read -p "$(echo -e ${GREEN}Ready to begin installation? [Y/n]:${NC} )" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
     echo -e "${RED}Installation cancelled.${NC}"
@@ -148,10 +168,16 @@ echo -e "   • Run ${BLUE}starship --version${NC} to verify prompt"
 echo -e "   • Try modern CLI tools: ${BLUE}bat, fd, rg, eza${NC}"
 echo -e "   • Check programming languages: ${BLUE}python3 --version, go version, node --version${NC}"
 echo
+echo -e "${CYAN}🔄 Backup & Restore:${NC}"
+echo -e "• ${YELLOW}Restore from backup:${NC} ${BLUE}./testing/restore-config.sh <backup-directory>${NC}"
+echo -e "• ${YELLOW}Clean test backups:${NC} ${BLUE}./testing/clean-all.sh${NC}"
+echo -e "• ${YELLOW}View backup guide:${NC} ${BLUE}testing/README.md${NC}"
+echo
 echo -e "${CYAN}📚 Resources:${NC}"
 echo -e "• Modern CLI tools guide: ${BLUE}dev/MODERN-CLI-TOOLS.md${NC}"
 echo -e "• ZSH features reference: ${BLUE}zsh/README.md${NC}"
 echo -e "• Development setup: ${BLUE}dev/README.md${NC}"
+echo -e "• Backup & testing guide: ${BLUE}testing/README.md${NC}"
 echo -e "• Troubleshooting: ${BLUE}troubleshooting/TROUBLESHOOTING.md${NC}"
 echo
 echo -e "${PURPLE}Enjoy your new development environment! 🚀${NC}"

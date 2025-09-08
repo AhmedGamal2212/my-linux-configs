@@ -74,6 +74,26 @@ cd my-linux-configs
 
 ## Manual Installation
 
+### 🔄 Backup First (Recommended)
+Before manual installation, create a comprehensive backup of your current configuration:
+
+```bash
+# Create timestamped backup of current configs
+./testing/backup-current-config.sh
+
+# This backs up: ~/.zshrc, ~/.vimrc, ~/.config/kitty/, ~/.config/starship.toml, 
+# ~/.oh-my-zsh/, and your current shell setting
+```
+
+**Restore Instructions:**
+```bash
+# If you need to restore later
+./testing/restore-config.sh ~/.config-backup-YYYYMMDD-HHMMSS
+
+# Clean up test backups when done
+./testing/clean-all.sh
+```
+
 ### System Preparation
 ```bash
 # Fix any permission issues first (if needed)
