@@ -119,12 +119,6 @@ mkdir -p ~/.config/kitty && cp kitty/kitty.conf ~/.config/kitty/
 cp zsh/zshrc ~/.zshrc
 ```
 
-### Ubuntu/Debian Terminal Theme (Optional)
-Enhanced terminal theme with additional visual improvements:
-```bash
-# From https://github.com/pixegami/terminal-profile
-curl -sL https://raw.githubusercontent.com/pixegami/terminal-profile/main/install_profile.sh | bash
-```
 
 ## Features
 
@@ -141,11 +135,11 @@ curl -sL https://raw.githubusercontent.com/pixegami/terminal-profile/main/instal
 - Performance optimizations
 
 ### ZSH Shell
-- Oh My Zsh with development-focused plugins
-- Vi mode integration
-- Java version switching (17/21)
-- Development aliases and functions
-- Enhanced history and completion
+- Oh My Zsh framework with intelligent completions
+- **Starship prompt** - Fast, cross-platform, highly customizable prompt
+- Custom aliases and productivity shortcuts
+- Git integration and status indicators  
+- Syntax highlighting and auto-suggestions
 - **☕ Coffee-Powered Features** - Because I can't let my caffeine addiction leave me anywhere I go, I've baked coffee into the terminal itself:
   - `coffee` alias for instant motivation brewing
   - Daily coffee quotes and programming wisdom

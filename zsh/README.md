@@ -4,12 +4,6 @@ Comprehensive ZSH setup with Oh My Zsh, development tools, and vim integration.
 
 ## Quick Setup
 
-### Terminal Profile Theme (Ubuntu/Debian only - recommended first)
-```bash
-# Install enhanced terminal theme with custom fonts, icons, git support, autocomplete
-# From https://github.com/pixegami/terminal-profile
-curl -sL https://raw.githubusercontent.com/pixegami/terminal-profile/main/install_profile.sh | bash
-```
 
 ### Automatic Installation
 ```bash

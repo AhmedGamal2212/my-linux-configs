@@ -7,7 +7,8 @@ export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
 # Oh My Zsh configuration
 export ZSH=~/.oh-my-zsh
-ZSH_THEME="pixegami-agnoster"
+# Using Starship prompt instead of Oh My Zsh themes
+ZSH_THEME=""
 
 # Plugins
 plugins=(
