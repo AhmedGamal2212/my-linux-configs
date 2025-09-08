@@ -11,7 +11,7 @@ Install Java 17 and 21 to work with the ZSH switcher functions.
 
 ### Manual Installation
 
-#### Ubuntu/Debian (Zorin OS)
+#### Ubuntu/Debian-based distributions
 ```bash
 sudo apt update
 sudo apt install -y openjdk-17-jdk openjdk-21-jdk

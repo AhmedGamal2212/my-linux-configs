@@ -1,8 +1,10 @@
 #!/bin/bash
-# Master installation script for Linux Config Repository
-# Interactive setup with proper dependency order
+# Interactive master installation script for Linux development environment setup
+# Created by Ahmed Gamal (Gemmy) - https://github.com/AhmedGamal2212/my-linux-configs
+# Because good developers deserve great development environments ☕
 
 set -e
+# Interactive setup with proper dependency order
 
 # Color codes for better output
 RED='\033[0;31m'
@@ -153,3 +155,6 @@ echo -e "• Development setup: ${BLUE}dev/README.md${NC}"
 echo -e "• Troubleshooting: ${BLUE}troubleshooting/TROUBLESHOOTING.md${NC}"
 echo
 echo -e "${PURPLE}Enjoy your new development environment! 🚀${NC}"
+echo
+echo -e "${CYAN}Created with ☕ by Ahmed Gamal (Gemmy)${NC}"
+echo -e "${BLUE}GitHub: https://github.com/AhmedGamal2212${NC}"

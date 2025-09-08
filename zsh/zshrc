@@ -586,8 +586,8 @@ caf() {
   # Colors (safe fallback)
   local RESET="\033[0m" CYAN="\033[36m" MAGENTA="\033[35m" YELLOW="\033[33m"
 
-  # --- Coffee Fortunes ---
-  local fortunes=(
+  # --- Coffee Quotes ---
+  local quotes=(
     "Today's brew: Courage, with a shot of chaos."
     "Coffee is temporary, code reviews are forever."
     "The mug chooses the programmer."
@@ -595,12 +595,12 @@ caf() {
     "Beans whisper: Ship it to prod. Ignore QA."
   )
 
-  local mode=$((RANDOM % 2))
-  local fortune_index=$(((RANDOM % ${#fortunes[@]}) + 1))
+  # Random selection (1-indexed)
+  local quote_index=$(((RANDOM % ${#quotes[@]}) + 1))
 
   case $mode in
-    0) # Coffee fortune
-      printf '%b%s%b\n' "$MAGENTA" "${fortunes[$fortune_index]}" "$RESET"
+    0) # Coffee quote
+      printf '%b%s%b\n' "$MAGENTA" "${quotes[$quote_index]}" "$RESET"
       ;;
     1) # Coffee brewing animation
       printf '%b%s%b' "$YELLOW" "Brewing coffee" "$RESET"

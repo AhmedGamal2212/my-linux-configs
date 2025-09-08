@@ -12,7 +12,7 @@ JAVA_HOME_21=/usr/lib/jvm/java-21-openjdk-amd64
 
 ## Installation Instructions
 
-### Ubuntu/Debian (Zorin OS)
+### Ubuntu/Debian-based distributions
 
 ```bash
 # Update package list
@@ -136,7 +136,7 @@ find /usr/lib/jvm -name "java-*-openjdk*" -type d
 
 ## Quick Setup Commands
 
-### For Ubuntu/Debian (Zorin OS)
+### For Ubuntu/Debian-based distributions
 ```bash
 sudo apt update && sudo apt install -y openjdk-17-jdk openjdk-21-jdk
 ```

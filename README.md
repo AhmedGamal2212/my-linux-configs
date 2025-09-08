@@ -7,6 +7,7 @@ Clean, modular dotfiles for quick Linux development environment setup on Debian 
 ```
 my-linux-config/
 ├── README.md
+├── install.sh          # 🚀 Interactive master installer
 ├── dev/
 │   ├── README.md
 │   ├── MODERN-CLI-TOOLS.md
@@ -145,16 +146,20 @@ curl -sL https://raw.githubusercontent.com/pixegami/terminal-profile/main/instal
 - Java version switching (17/21)
 - Development aliases and functions
 - Enhanced history and completion
+- **☕ Coffee-Powered Features** - Because I can't let my caffeine addiction leave me anywhere I go, I've baked coffee into the terminal itself:
+  - `coffee` alias for instant motivation brewing
+  - Daily coffee quotes and programming wisdom
+  - Coffee quotes on terminal startup
+  - Brewing animations for those "compiling..." moments
 
 ### Fonts
 - Fira Code (primary) with JetBrains Mono backup
 - Automatic installation and fallback handling
 
 ## Supported Systems
-- Zorin OS (Ubuntu-based)
-- Fedora KDE
-- Other Debian/Ubuntu derivatives
-- Other Red Hat derivatives
+- Ubuntu/Debian-based distributions (Ubuntu, Linux Mint, Pop!_OS, Elementary OS, etc.)
+- Fedora and Red Hat-based distributions
+- Other derivatives with apt or dnf package managers
 
 ## Installation Scripts
 - Automatic package manager detection (apt/dnf)

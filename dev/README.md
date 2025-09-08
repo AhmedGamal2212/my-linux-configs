@@ -6,7 +6,7 @@ This guide covers programming languages and development tools **not included** i
 
 ### System Build Tools (Essential)
 ```bash
-# Ubuntu/Debian (Zorin OS)
+# Ubuntu/Debian-based distributions
 sudo apt update && sudo apt install -y build-essential curl git wget
 
 # Fedora
