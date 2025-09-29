@@ -10,6 +10,25 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Function to reload shell environment and PATH
+reload_shell_environment() {
+    echo -e "${BLUE}🔄 Reloading shell environment...${NC}"
+
+    # Add common binary paths to current session
+    export PATH="$HOME/.cargo/bin:/usr/local/go/bin:$HOME/go/bin:$HOME/.local/bin:$PATH"
+
+    # Source profile files if they exist
+    [ -f "$HOME/.bashrc" ] && source "$HOME/.bashrc" 2>/dev/null || true
+    [ -f "$HOME/.zshrc" ] && source "$HOME/.zshrc" 2>/dev/null || true
+    [ -f "$HOME/.profile" ] && source "$HOME/.profile" 2>/dev/null || true
+    [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env" 2>/dev/null || true
+
+    # Clear bash hash table
+    hash -r 2>/dev/null || true
+
+    echo -e "${GREEN}✅ Shell environment reloaded${NC}"
+}
+
 echo -e "${GREEN}=== Essential Development Environment Setup ===${NC}"
 echo -e "${BLUE}Installing core development tools and programming languages...${NC}"
 echo
@@ -72,6 +91,7 @@ else
     echo -e "${YELLOW}Installing Go programming language (latest version)...${NC}"
     bash <(curl -sL https://git.io/go-installer)
     GO_INSTALLED=true
+    reload_shell_environment
     echo -e "${GREEN}✅ Go installation completed${NC}"
 fi
 
@@ -134,8 +154,7 @@ echo -e "\n${BLUE}🦀 Rust Programming Language${NC}"
 echo -e "${YELLOW}Installing Rust (required for modern CLI tools)...${NC}"
 if ! command -v cargo &> /dev/null; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    # Source Rust environment for current session
-    source ~/.cargo/env
+    reload_shell_environment
     echo -e "${GREEN}✅ Rust installed successfully${NC}"
 else
     echo -e "${GREEN}✅ Rust already installed${NC}"

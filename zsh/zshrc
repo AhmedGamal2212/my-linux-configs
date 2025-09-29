@@ -60,20 +60,43 @@ zle -N zle-keymap-select
 # Development Environment Setup
 # ===================================================================
 
-# Java version switcher functions
+# Java version switcher functions (cross-platform)
+# Default Debian/Ubuntu paths
 export JAVA_HOME_17=/usr/lib/jvm/java-17-openjdk-amd64
 export JAVA_HOME_21=/usr/lib/jvm/java-21-openjdk-amd64
+
+# Check for Fedora and override paths if needed
+if [ -f /etc/fedora-release ]; then
+    export JAVA_HOME_17=/usr/lib/jvm/java-17-openjdk
+    export JAVA_HOME_21=/usr/lib/jvm/java-21-openjdk
+fi
+
+# Load any local overrides (created by Java installer)
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+
 export JAVA_HOME=$JAVA_HOME_21
 
-setJdk17() { 
+setJdk17() {
     export JAVA_HOME=$JAVA_HOME_17
     export PATH=$JAVA_HOME/bin:$PATH
+
+    # Update alternatives on Fedora
+    if [ -f /etc/fedora-release ] && command -v alternatives &> /dev/null; then
+        sudo alternatives --set java ${JAVA_HOME_17}/bin/java 2>/dev/null || true
+    fi
+
     echo "Java 17 activated: $(java -version 2>&1 | head -n1)"
 }
 
-setJdk21() { 
+setJdk21() {
     export JAVA_HOME=$JAVA_HOME_21
     export PATH=$JAVA_HOME/bin:$PATH
+
+    # Update alternatives on Fedora
+    if [ -f /etc/fedora-release ] && command -v alternatives &> /dev/null; then
+        sudo alternatives --set java ${JAVA_HOME_21}/bin/java 2>/dev/null || true
+    fi
+
     echo "Java 21 activated: $(java -version 2>&1 | head -n1)"
 }
 

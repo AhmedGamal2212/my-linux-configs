@@ -33,6 +33,22 @@ install_java() {
         JAVA_17_PATH="/usr/lib/jvm/java-17-openjdk"
         JAVA_21_PATH="/usr/lib/jvm/java-21-openjdk"
         
+        # Set up alternatives system for Fedora
+        echo -e "${YELLOW}Setting up Java alternatives system for Fedora...${NC}"
+        sudo alternatives --install /usr/bin/java java ${JAVA_17_PATH}/bin/java 1700000 \
+            --slave /usr/bin/javac javac ${JAVA_17_PATH}/bin/javac \
+            --slave /usr/bin/jar jar ${JAVA_17_PATH}/bin/jar \
+            --slave /usr/bin/javadoc javadoc ${JAVA_17_PATH}/bin/javadoc
+
+        sudo alternatives --install /usr/bin/java java ${JAVA_21_PATH}/bin/java 2100000 \
+            --slave /usr/bin/javac javac ${JAVA_21_PATH}/bin/javac \
+            --slave /usr/bin/jar jar ${JAVA_21_PATH}/bin/jar \
+            --slave /usr/bin/javadoc javadoc ${JAVA_21_PATH}/bin/javadoc
+
+        # Set Java 21 as default
+        sudo alternatives --set java ${JAVA_21_PATH}/bin/java
+        echo -e "${GREEN}✅ Java alternatives configured (Java 21 set as default)${NC}"
+
         # Create local config for Fedora paths
         echo -e "${YELLOW}Creating ~/.zshrc.local with Fedora-specific Java paths...${NC}"
         cat >> ~/.zshrc.local << EOF

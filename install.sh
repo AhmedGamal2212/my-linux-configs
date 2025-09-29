@@ -33,7 +33,7 @@ print_module_info() {
 ask_confirmation() {
     local module_name="$1"
     local description="$2"
-    
+
     print_module_info "$module_name" "$description"
     read -p "$(echo -e ${GREEN}Continue with this module? [Y/n]:${NC} )" -n 1 -r
     echo
@@ -42,6 +42,39 @@ ask_confirmation() {
         return 1
     fi
     return 0
+}
+
+# Function to detect Hyprland environment
+is_hyprland() {
+    [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ] || [ "$DESKTOP_SESSION" = "hyprland" ] || [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]
+}
+
+# Hyprland-safe script execution function
+safe_execute() {
+    local dir="$1"
+    local script="$2"
+
+    if is_hyprland; then
+        echo -e "${BLUE}🔧 Hyprland environment detected - using safe execution mode${NC}"
+        # Use absolute paths and subshell for Hyprland compatibility
+        local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        local full_path="$script_dir/$dir/$script"
+
+        if [ -f "$full_path" ]; then
+            (cd "$script_dir/$dir" && bash "$script")
+        else
+            echo -e "${RED}❌ Script not found: $full_path${NC}"
+            return 1
+        fi
+    else
+        # Standard execution for non-Hyprland environments
+        if [ -d "$dir" ] && [ -f "$dir/$script" ]; then
+            cd "$dir" && "./$script" && cd ..
+        else
+            echo -e "${RED}❌ Directory or script not found: $dir/$script${NC}"
+            return 1
+        fi
+    fi
 }
 
 print_header "🚀 Linux Development Environment Setup"
@@ -71,7 +104,7 @@ echo
 if [[ ! $REPLY =~ ^[Nn]$ ]]; then
     if [ -f testing/backup-current-config.sh ]; then
         echo -e "${BLUE}🔄 Creating comprehensive backup...${NC}"
-        cd testing && ./backup-current-config.sh && cd ..
+        safe_execute "testing" "backup-current-config.sh"
         echo -e "${GREEN}✅ Backup completed - you can restore later if needed${NC}"
         echo
     else
@@ -104,7 +137,7 @@ fi
 if ask_confirmation "Fonts Installation" "Install Fira Code and JetBrains Mono fonts.\nRequired for proper terminal display and modern CLI tools."; then
     print_header "🔤 Installing Fonts"
     echo -e "${BLUE}📦 Installing font packages...${NC}"
-    cd fonts && ./install.sh && cd ..
+    safe_execute "fonts" "install.sh"
     echo -e "\n${GREEN}✅ Fonts installation completed${NC}\n"
 fi
 
@@ -112,7 +145,7 @@ fi
 if ask_confirmation "Development Environment" "Install core development tools and programming languages.\nIncludes: build tools, git, Rust (required for modern CLI tools).\n🎯 Interactive: You'll choose which languages to install (Python, Node.js, Go)."; then
     print_header "🛠️  Development Environment Setup"
     echo -e "${BLUE}🔧 Setting up development tools...${NC}"
-    cd dev && ./install-essentials.sh && cd ..
+    safe_execute "dev" "install-essentials.sh"
     echo -e "\n${GREEN}✅ Development environment completed${NC}\n"
 fi
 
@@ -120,7 +153,7 @@ fi
 if ask_confirmation "Terminal & Shell Setup" "Install and configure ZSH with Oh My Zsh, Starship prompt,\nand modern CLI tools (eza, bat, fd-find, ripgrep, tig, fzf).\nCreates a powerful, beautiful terminal experience."; then
     print_header "🐚 Terminal & Shell Setup"
     echo -e "${BLUE}🐚 Installing ZSH and modern CLI tools...${NC}"
-    cd zsh && ./install.sh && cd ..
+    safe_execute "zsh" "install.sh"
     echo -e "\n${GREEN}✅ Terminal & shell setup completed${NC}\n"
 fi
 
@@ -128,7 +161,7 @@ fi
 if ask_confirmation "Kitty Terminal" "Install and configure Kitty terminal emulator.\nModern GPU-accelerated terminal with great font rendering.\nOptional but recommended for best experience."; then
     print_header "🖥️  Terminal Emulator Setup"
     echo -e "${BLUE}🖥️  Installing Kitty terminal emulator...${NC}"
-    cd kitty && ./install.sh && cd ..
+    safe_execute "kitty" "install.sh"
     echo -e "\n${GREEN}✅ Kitty terminal setup completed${NC}\n"
 fi
 
@@ -136,7 +169,7 @@ fi
 if ask_confirmation "Vim Editor" "Install and configure Vim with development-friendly settings.\nClean, minimal setup with essential features.\nOptional if you use other editors."; then
     print_header "📝 Editor Configuration"
     echo -e "${BLUE}📝 Configuring Vim editor...${NC}"
-    cd vim && ./install.sh && cd ..
+    safe_execute "vim" "install.sh"
     echo -e "\n${GREEN}✅ Vim configuration completed${NC}\n"
 fi
 
@@ -144,7 +177,7 @@ fi
 if ask_confirmation "Java Development" "Install and configure Java development environment.\nIncludes OpenJDK 17 & 21 with version switching.\nOptional - only install if you need Java development."; then
     print_header "☕ Java Development Setup"
     echo -e "${BLUE}☕ Installing Java development environment...${NC}"
-    cd java && ./install.sh && cd ..
+    safe_execute "java" "install.sh"
     echo -e "\n${GREEN}✅ Java development setup completed${NC}\n"
 fi
 
@@ -152,7 +185,7 @@ fi
 if ask_confirmation "Optional Development Tools" "Install additional development tools:\n• Database clients (SQLite, PostgreSQL, MySQL)\n• Network tools (HTTPie, jq), Archive utilities\n• Docker (interactive choice), neofetch (interactive choice)\n🎯 Interactive: You'll choose specific tools within each category."; then
     print_header "🔧 Optional Development Tools"
     echo -e "${BLUE}🔧 Installing optional development tools...${NC}"
-    cd dev && ./install-optional.sh && cd ..
+    safe_execute "dev" "install-optional.sh"
     echo -e "\n${GREEN}✅ Optional tools installation completed${NC}\n"
 fi
 
